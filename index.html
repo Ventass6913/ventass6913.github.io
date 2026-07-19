@@ -180,6 +180,7 @@
                             attributes: row['속성'] ? row['속성'].split(',').map(s => s.trim()) : [],
                             image: row['이미지링크'] || '',
                             description: row['상세설명'] || '상세 설명이 없습니다.'
+                            partner: row['짝꿍'] || '없음'
                         }));
                     
                     document.getElementById('loading').style.display = 'none';
